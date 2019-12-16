@@ -1,3 +1,4 @@
+import logging
 import operator
 import pickle
 import re
@@ -6,13 +7,11 @@ from itertools import product
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 
+import progressbar
 from many_stop_words import get_stop_words
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer, word_tokenize
 from stop_words import get_stop_words
-import logging
-import progressbar
-
 
 logger = logging.getLogger(__name__)
 
