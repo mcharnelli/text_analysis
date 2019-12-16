@@ -35,17 +35,19 @@ def remove_digits(d):
     return re.sub('\d+', '', d)
 
 
-DEFAULT_PROCESS = [
+DEFAULT_PIPELINE = [
     lowercase, apostrophes, letter_digit_underscore, remove_space_newline_tab,
     remove_punctuation, remove_digits
 ]
 
 
-def clean_content(data, process, stop_words, join=False):
+def clean_content(data, pipeline=None, stop_words=[], join=False):
+    if pipeline is None:
+        pipeline = DEFAULT_PIPELINE
     documents = []
     for d in data:
         w = d
-        for process_fun in process:
+        for process_fun in pipeline:
             w = process_fun(w)
         sentence = [word for word in word_tokenize(w) if word not in stop_words]
         if join:
