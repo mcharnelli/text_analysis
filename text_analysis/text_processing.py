@@ -71,11 +71,6 @@ def get_stopwords(lang):
     return stop_words
 
 
-def add_other_stopwords(stop_words, other_stop_words):
-    stop_words.update(other_stop_words)
-    return stop_words
-
-
 def get_topics_distribution(categories, min_occurences=12):
     """
     Get Topics Distribution
@@ -151,19 +146,3 @@ def topic_assignment(question, topic_distribution):
         prob = max(p_z_d.items(), key=operator.itemgetter(1))[0]
     return prob
 
-
-if __name__ == '__main__':
-    topics_dist = get_topics_distribution()
-    #max_word = sorted(topics_dist['basketball'].items(), key=operator.itemgetter(1))[::-1][1:10]
-    #print(max_word)
-    print("prob de kung en artes marciales " +
-          str(topics_dist['martial arts']['kung']))
-    print(topics_dist['tennis'])
-    #question = 'How many points does a volleyball set have?'
-    # me la clasifica de beach volleyball y no volleyball
-    question = 'Where is Kung Fu from? USA Japan Antarctica China USA Japan Antarctica China'
-    question = 'What age was Maria Sharapova when she won Wimbledon in 2004? 21 14 17 18 21 14 17 18'
-    vector = cleaning_tokenize(question)
-    print(vector)
-    category = get_category(vector)
-    print(category)
