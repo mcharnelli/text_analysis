@@ -1,6 +1,10 @@
 # Textmining 
 
 ## Instalación
+```
+import nltk
+nltk.download('punkt')
+```
 
 ### Sólo uso:
 

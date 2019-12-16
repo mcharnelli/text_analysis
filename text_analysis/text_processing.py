@@ -10,31 +10,37 @@ from itertools import product
 from many_stop_words import get_stop_words
 
 
+def lowercase(d):
+    return d.lower()
 
-def clean_content(df, stop_words):
-    data = df.astype(str)
-    # Converting text to lowercase characters
-    data = data.str.lower()
-    # Remove apostrophes
-    data = data.str.replace("'", ' ')
-    # Removing any character which does not match to letter,digit or underscore
+def apostrophes(s):
+    return s.replace("'", "")
+
+def letter_digit_underscore(d):
     pat = r'^\W+|\W+$'
-    data = data.str.replace(pat, ' ')
-    # Removing space,newline,tab
-    pat = r'\s'
-    data = data.str.replace(pat, ' ')
-    # Removing punctuation
-    pat = r'[^a-zA-Z0-9]'
-    data = data.str.replace(pat, ' ')
-    # Removing digits
-    data = data.str.replace(r'\d+', '')
-    # Tokenizing data
-    # data.dropna(inplace=True)
-    data = data.apply(word_tokenize)
-    # Removing stopwords
-    data = data.apply(lambda x: [i for i in x if i not in stop_words])
+    return re.sub(pat, ' ', d)
 
-    return data
+def remove_space_newline_tab(d):
+    return re.sub( r'\s', ' ', d)
+
+def remove_punctuation(d):
+    return re.sub(r'[^a-zA-Z0-9]', ' ', d)
+    
+
+def remove_digits(d):
+    return re.sub('\d+', '', d)
+
+DEFAULT_PROCESS = [lowercase, apostrophes, letter_digit_underscore, remove_space_newline_tab, remove_punctuation, remove_digits, word_tokenize]
+
+def clean_content(data, process, stop_words):
+    words = []
+    for d in data:
+        w = d
+        for process_fun in process:
+            w = process_fun(w)
+            print(w)
+        words.append(w)
+    return [word for word in words if word not in stop_words]
 
 
 def cleaning_tokenize(text, ln):
