@@ -56,29 +56,6 @@ def clean_content(data, pipeline=None, stop_words=[], join=False):
     return documents
 
 
-def cleaning_tokenize(text, ln):
-    tokens = get_tokens_text(text)
-    tokens = cleaning_stopwords(tokens, ln)
-    return tokens
-
-
-def cleaning_stopwords(vector, ln):
-    filtered_vector = []
-    for word in vector:
-        if word not in get_stopwords(ln):
-            filtered_vector.append(word)
-    return filtered_vector
-
-
-def get_tokens_text(text):
-    content = text.lower()
-    content = re.sub(r'[0-9]+', '', content)
-    content = re.sub(r'[^\w]', ' ', content)
-    tokenizer = RegexpTokenizer(r'\w+')
-    tokens = tokenizer.tokenize(content)
-    return tokens
-
-
 def get_stopwords(lang):
     stop_words = set(get_stop_words(lang))  # About 900 stopwords
     nltk_words = {}
