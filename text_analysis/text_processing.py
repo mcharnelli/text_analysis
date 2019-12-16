@@ -43,9 +43,26 @@ DEFAULT_PIPELINE = [
 ]
 
 
-def clean_content(data, pipeline=None, stop_words=[], join=False):
-    if pipeline is None:
-        pipeline = DEFAULT_PIPELINE
+def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False):
+    """Clean text data
+
+    Arguments:
+        data: list of str
+              The list of documents to be cleaned
+
+    Keyword Arguments:
+        pipeline: list of functions
+                   A sequence of function to be applied to every document
+                   default=DEFAULT_PIPELINE
+        stop_words: iterable
+                    Stop words to remove from each document
+        join: bool
+              Wheter to join the tokenized document or not
+
+    Returns:
+        list of str
+        Document processed.
+    """
     documents = []
     for d in data:
         w = d
