@@ -57,14 +57,11 @@ def clean_content(data, pipeline=None, stop_words=[], join=False):
 
 
 def get_stopwords(lang):
-    stop_words = set(get_stop_words(lang))  # About 900 stopwords
-    nltk_words = {}
-    if lang == 'en':
-        nltk_words = set(stopwords.words('english'))  # About 150 stopwords
-    if lang == 'es':
-        nltk_words = set(stopwords.words('spanish'))  # About 150 stopwords
-    if lang == 'pt':
-        nltk_words = set(stopwords.words('portuguese'))  # About 150 stopwords
+    lang_mapping = {'en': 'english',
+                    'es': 'spanish',
+                    'pt': 'portuguese'}
+    stop_words = set(get_stop_words(lang))  # About 900 stopwords    
+    nltk_words = set(stopwords.words(lang_mapping[lang]))  # About 150 stopwords    
     m_stop_words = set(get_stop_words(lang))
     stop_words.update(nltk_words)
     stop_words.update(m_stop_words)
