@@ -38,7 +38,6 @@ def clean_content(data, process, stop_words):
         w = d
         for process_fun in process:
             w = process_fun(w)
-            print(w)
         words.append(w)
     return [word for word in words if word not in stop_words]
 
