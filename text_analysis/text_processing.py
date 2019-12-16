@@ -10,6 +10,11 @@ from many_stop_words import get_stop_words
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer, word_tokenize
 from stop_words import get_stop_words
+import logging
+import progressbar
+
+
+logger = logging.getLogger(__name__)
 
 
 def lowercase(d):
@@ -43,7 +48,7 @@ DEFAULT_PIPELINE = [
 ]
 
 
-def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False):
+def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False, tokenizer=word_tokenize):
     """Clean text data
 
     Arguments:
@@ -63,13 +68,14 @@ def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False):
         list of str
         Document processed.
     """
+    logger.info('Cleaning content')
     documents = []
-    for d in data:
+    for d in progressbar.progressbar(data):
         w = d
         for process_fun in pipeline:
             w = process_fun(w)
         sentence = [
-            word for word in word_tokenize(w) if word not in stop_words
+            word for word in tokenizer(w) if word not in stop_words
         ]
         if join:
             sentence = ' '.join(sentence)
@@ -78,7 +84,7 @@ def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False):
 
 
 def get_stopwords(lang):
-    lang_mapping = {'en': 'english', 'es': 'spanish', 'pt': 'portuguese'}
+    lang_mapping = {'en': 'english', 'es': 'spanish', 'pt': 'portuguese', 'it': 'italian'}
     stop_words = set(get_stop_words(lang))
     nltk_words = set(stopwords.words(lang_mapping[lang]))
     m_stop_words = set(get_stop_words(lang))
