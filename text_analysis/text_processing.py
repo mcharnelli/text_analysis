@@ -1,13 +1,15 @@
-from stop_words import get_stop_words
-from nltk.tokenize import RegexpTokenizer, word_tokenize
-from nltk.corpus import stopwords
 import operator
-import re
 import pickle
+import re
+from itertools import product
+
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
-from itertools import product
+
 from many_stop_words import get_stop_words
+from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer, word_tokenize
+from stop_words import get_stop_words
 
 
 def lowercase(d):
@@ -49,7 +51,9 @@ def clean_content(data, pipeline=None, stop_words=[], join=False):
         w = d
         for process_fun in pipeline:
             w = process_fun(w)
-        sentence = [word for word in word_tokenize(w) if word not in stop_words]
+        sentence = [
+            word for word in word_tokenize(w) if word not in stop_words
+        ]
         if join:
             sentence = ' '.join(sentence)
         documents.append(sentence)
@@ -57,11 +61,9 @@ def clean_content(data, pipeline=None, stop_words=[], join=False):
 
 
 def get_stopwords(lang):
-    lang_mapping = {'en': 'english',
-                    'es': 'spanish',
-                    'pt': 'portuguese'}
-    stop_words = set(get_stop_words(lang))  # About 900 stopwords    
-    nltk_words = set(stopwords.words(lang_mapping[lang]))  # About 150 stopwords    
+    lang_mapping = {'en': 'english', 'es': 'spanish', 'pt': 'portuguese'}
+    stop_words = set(get_stop_words(lang))
+    nltk_words = set(stopwords.words(lang_mapping[lang]))
     m_stop_words = set(get_stop_words(lang))
     stop_words.update(nltk_words)
     stop_words.update(m_stop_words)
@@ -142,4 +144,3 @@ def topic_assignment(question, topic_distribution):
     else:
         prob = max(p_z_d.items(), key=operator.itemgetter(1))[0]
     return prob
-
