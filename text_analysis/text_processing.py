@@ -13,6 +13,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer, word_tokenize
 from stop_words import get_stop_words
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -46,6 +47,13 @@ DEFAULT_PIPELINE = [
     remove_punctuation, remove_digits
 ]
 
+
+def vocabulary_size(data):
+    logging.info('Computing Vocabulary size')
+    d = set()
+    for sentence in data:
+        d.update(w for w in word_tokenize(sentence))
+    return len(d)
 
 def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False, tokenizer=word_tokenize):
     """Clean text data
