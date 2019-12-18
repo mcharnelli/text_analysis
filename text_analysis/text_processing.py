@@ -12,7 +12,7 @@ from many_stop_words import get_stop_words
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer, word_tokenize
 from stop_words import get_stop_words
-
+import string
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def apostrophes(s):
 
 
 def letter_digit_underscore(d):
-    pat = r'^\W+|\W+$'
+    pat = r'[^\wáéíóúàèìòùÁÉÍÓÚÀÈÌÒÙ]'
     return re.sub(pat, ' ', d)
 
 
@@ -34,8 +34,15 @@ def remove_space_newline_tab(d):
     return re.sub(r'\s', ' ', d)
 
 
+def remove_url(d):
+    return re.sub(r'http\S+', '', d)
+
+
+table = str.maketrans(dict.fromkeys(string.punctuation))
+
+
 def remove_punctuation(d):
-    return re.sub(r'[^a-zA-Z0-9]', ' ', d)
+    return d.translate(table)
 
 
 def remove_digits(d):
@@ -43,9 +50,51 @@ def remove_digits(d):
 
 
 DEFAULT_PIPELINE = [
-    lowercase, apostrophes, letter_digit_underscore, remove_space_newline_tab,
-    remove_punctuation, remove_digits
+    remove_url, lowercase, apostrophes, letter_digit_underscore,
+    remove_space_newline_tab, remove_punctuation, remove_digits
 ]
+
+
+def min_length(d, min_l=4):
+    return len(d) >= min_l
+
+
+DEFAULT_VALIDATION = [min_length]
+
+
+def validate_word(validation, word):
+    valid = True
+    for validation_fun in validation:
+        if not validation_fun(word):
+            valid = False
+            break
+    return valid
+
+
+def clean_sentence(sentence,
+                   pipeline=DEFAULT_PIPELINE,
+                   stop_words=[],
+                   validation=DEFAULT_VALIDATION,
+                   join=False,
+                   tokenizer=word_tokenize):
+    for process_fun in pipeline:
+        if len(sentence) == 0:
+            break
+        sentence = process_fun(sentence)
+    if len(sentence) == 0:
+        return ""
+
+    final_sentence = []
+    for word in tokenizer(sentence):
+        if word in stop_words:
+            continue
+        if not validate_word(validation, word):
+            continue
+        final_sentence.append(word)
+    if join:
+        return ' '.join(final_sentence)
+    else:
+        return final_sentence
 
 
 def vocabulary_size(data):
@@ -55,7 +104,13 @@ def vocabulary_size(data):
         d.update(w for w in word_tokenize(sentence))
     return len(d)
 
-def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False, tokenizer=word_tokenize):
+
+def clean_content(data,
+                  pipeline=DEFAULT_PIPELINE,
+                  stop_words=[],
+                  validation=DEFAULT_VALIDATION,
+                  join=False,
+                  tokenizer=word_tokenize):
     """Clean text data
 
     Arguments:
@@ -78,20 +133,19 @@ def clean_content(data, pipeline=DEFAULT_PIPELINE, stop_words=[], join=False, to
     logger.info('Cleaning content')
     documents = []
     for d in progressbar.progressbar(data):
-        w = d
-        for process_fun in pipeline:
-            w = process_fun(w)
-        sentence = [
-            word for word in tokenizer(w) if word not in stop_words
-        ]
-        if join:
-            sentence = ' '.join(sentence)
-        documents.append(sentence)
+        documents.append(
+            clean_sentence(d, pipeline, stop_words, validation, join,
+                           tokenizer))
     return documents
 
 
 def get_stopwords(lang):
-    lang_mapping = {'en': 'english', 'es': 'spanish', 'pt': 'portuguese', 'it': 'italian'}
+    lang_mapping = {
+        'en': 'english',
+        'es': 'spanish',
+        'pt': 'portuguese',
+        'it': 'italian'
+    }
     stop_words = set(get_stop_words(lang))
     nltk_words = set(stopwords.words(lang_mapping[lang]))
     m_stop_words = set(get_stop_words(lang))
